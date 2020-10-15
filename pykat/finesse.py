@@ -2068,7 +2068,7 @@ class kat(object):
 
         kat_binary - Name of binary file to run
         """
-        p = Popen([self._finesse_exec(kat_binary), '-v'], stdout=PIPE)
+        p = Popen([self._finesse_exec(kat_binary), '-v'], stdout=PIPE, stderr=PIPE)
 
         out, err = p.communicate()
 
@@ -2095,7 +2095,7 @@ class kat(object):
             else:
                 raise pkex.BasePyKatException("page must be 1 or 2")
 
-        p = Popen([self._finesse_exec(kat_binary), command_str], stdout=PIPE)
+        p = Popen([self._finesse_exec(kat_binary), command_str], stdout=PIPE, stderr=PIPE)
 
         out, err = p.communicate()
 
