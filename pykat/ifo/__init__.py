@@ -128,7 +128,32 @@ def make_transparent(kat, _components):
         raise pkex.BasePyKatException("Cannot find component {}".format(components))
         
     return kat
-    
+
+def null_modulation_index(kat, _components=None, verbose=False):    
+    if _components == None:
+        for o in kat.components.values():
+            if isinstance(o, pykat.components.modulator): 
+                o.midx = 0
+                if verbose:
+                    print(f"{o.name}: setting midx=0")
+
+    else:
+        components=make_list_copy(_components)
+        for o in kat.components.values():
+            if o in components:
+                if isinstance(o, pykat.components.modulator): 
+                    o.midx = 0
+                    if verbose:
+                        print(f"{o.name}: setting midx=0")
+                    components = [c for c in components if c != o]
+                else:
+                    raise pkex.BasePyKatException("{} is not a modulator".format(o.name))
+                    
+        if len(components) != 0:
+            raise pkex.BasePyKatException("Cannot find component {}".format(components))
+        
+    return kat
+
 def round_to_n(x, n):
     if not x: return 0
     power = -int(math.floor(math.log10(abs(x)))) + (n - 1)
@@ -167,7 +192,7 @@ def make_list_copy(_l):
         
     return _l[:] # copy the list, just to be save
 
-def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90.0, debug=None, extra_cmds=None):
+def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90.0, relative=False, debug=None, extra_cmds=None):
     """
     Scans a DOF for a kat object to maximise or minimise the DOF's signal. 
     
@@ -182,7 +207,7 @@ def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90
     Returns phi of min/max and precision reached
     """
     while precision > target_precision * DOF.scale:
-        out = scan_DOF(DOF.kat, DOF, xlimits = [phi-1.5*precision, phi+1.5*precision], extra_cmds=extra_cmds)
+        out = scan_DOF(DOF.kat, DOF, xlimits = [phi-1.5*precision, phi+1.5*precision], relative=relative, extra_cmds=extra_cmds)
         phi, precision = find_peak(out, DOF.port.name, minmax=minmax, debug=debug)
          
     return phi, precision
@@ -338,7 +363,7 @@ def scan_DOF(kat, DOF, xlimits=[-100, 100], steps=200, relative=False, extra_cmd
     
     if extra_cmds:
         kat.parse(extra_cmds)
-        
+    
     return kat.run(cmd_args=["-cr=on"])
 
 def scan_optics(kat, _optics, _factors, target="phi", xlimits=[-100, 100], steps=200,relative=False, extra_cmds=None): 
@@ -1614,7 +1639,7 @@ class Output(object):
             Name of the frequency attribute in IFO. This should be a name of a frequency
             attribute in the IFO class, this is used when computing what frequency to
             demodulate at. None means a DC output
-        phase : foat
+        phase : float
             Demodulation phase
         block : str
             Which block in the kat object to add the commands to
