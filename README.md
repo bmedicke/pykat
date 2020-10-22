@@ -6,18 +6,22 @@ It aims to provide a Python toolset for automating more complex tasks
 as well as providing a GUI for manipulating and viewing simulation
 setups.
 
+An article is available providing an overview of pykat: https://doi.org/10.1016/j.softx.2020.100613
+
 Source code is hosted at https://git.ligo.org/finesse/pykat
 
 Please cite pykat when used with::
 
-    @Misc{Pykat,
-      Title                    = {Pykat},
-      Author                   = {Brown, Daniel David and Freise, Andreas},
-      Month                    = {July},
-      Note                     = {{\url{http://www.gwoptics.org/pykat}}},
-      Year                     = {2017},
-      Doi                      = {10.5281/zenodo.821389},
-      Url                      = {http://www.gwoptics.org/pykat}
+    @article{BROWN_PYKAT,
+        title = "Pykat: Python package for modelling precision optical interferometers",
+        journal = "SoftwareX",
+        volume = "12",
+        pages = "100613",
+        year = "2020",
+        issn = "2352-7110",
+        doi = "https://doi.org/10.1016/j.softx.2020.100613",
+        url = "http://www.sciencedirect.com/science/article/pii/S2352711020303265",
+        author = "Daniel D. Brown and Philip Jones and Samuel Rowlinson and Sean Leavey and Anna C. Green and Daniel Toyra and Andreas Freise",
     }
 
 
