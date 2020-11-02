@@ -277,15 +277,19 @@ class beam(Detector1):
         
         self.alternate_beam = alternate_beam
         self.__f = Param("f", self, frequency)        
+        self.__x = Param("x", self, 0)        
+        self.__y = Param("y", self, 0)        
     
         self._freeze()
         
     @property
     def f(self): return self.__f
     
-    @f.setter
-    def f(self, value):
-        self.__f.value = value
+    @property
+    def x(self): return self.__x
+    
+    @property
+    def y(self): return self.__y
         
     @staticmethod
     def parseFinesseText(text):
