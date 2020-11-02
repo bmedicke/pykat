@@ -22,24 +22,24 @@ class SensingMatrix(DataFrame):
     @property
     def _constructor(self):
         return SensingMatrix
-        
+
     def display(self):
         df = self
         from tabulate import tabulate
         keys = list(df.keys())
         keys.insert(0, "")
         
-        print(tabulate(df.apply(np.abs), headers=keys, floatfmt=".3g"))
+        print(tabulate(df.apply(np.abs), headers=keys, floatfmt=".3e"))
         print()
         
-        keys[0] = "[deg]"
+        keys[0] = "deg"
         print(tabulate(df.apply(lambda x: np.angle(x,True)), headers=keys, floatfmt=".3g"))
     
     def phase_reference(self, DOF):
         ref = np.angle(self.loc[DOF])
         return self.apply(lambda row: row * np.exp(-1j * ref), axis=1)
     
-    def radar_plot(self, detector_I, detector_Q, DOFs=None, ax=None, title=None):
+    def radar_plot(self, detector_I, detector_Q, DOFs=None, ax=None, title=None, show_yticks=True, filename=None):
         """Generates an I-Q quadrature radar plot from this sensing matrix.
                     
         Parameters
@@ -58,6 +58,9 @@ class SensingMatrix(DataFrame):
         
         title: str, optional
             Title of plot
+
+        filename: str, optional
+            name of file, figure will be saved when not None
         """
         import matplotlib.pyplot as plt
         import numpy as np
@@ -84,16 +87,21 @@ class SensingMatrix(DataFrame):
         for _, s in zip(keys, scaling):
             theta = np.angle(A[_])
             r = np.log10(np.abs(A[_]))
-            _ax.plot((theta,theta), (r_lim[0], r), lw=s, label=_)
+            _ax.plot((theta,theta), (r_lim[0], r), lw=s, marker='D', markersize=5, label=_)
         ttl = _ax.set_title(title, fontsize=11)
         ttl.set_position([.5, 1.12])
         _ax.set_ylim(r_lim[0], r_lim[1])
         _ax.legend(bbox_to_anchor=(0.5, -0.1), loc="upper center", ncol=3, fontsize=10)
-        _ax.set_rticks(np.arange(*np.round(r_lim)))
-        _ax.set_yticklabels(tuple( "$10^{%s}$" % _ for _ in np.arange(*np.round(r_lim), dtype=int)))
+        if show_yticks:
+            _ax.set_rticks(np.arange(*np.round(r_lim)))
+            _ax.set_yticklabels(tuple( "$10^{%s}$" % _ for _ in np.arange(*np.round(r_lim), dtype=int)))
+        else:
+            _ax.set_yticklabels([])
         _ax.grid(True, alpha=0.5, zorder=-10)
         if ax is None:
             plt.tight_layout()
+            if filename is not None:
+                plt.savefig(filename)
             plt.show()
         
 def make_transparent(kat, _components):
@@ -120,7 +128,32 @@ def make_transparent(kat, _components):
         raise pkex.BasePyKatException("Cannot find component {}".format(components))
         
     return kat
-    
+
+def null_modulation_index(kat, _components=None, verbose=False):    
+    if _components == None:
+        for o in kat.components.values():
+            if isinstance(o, pykat.components.modulator): 
+                o.midx = 0
+                if verbose:
+                    print(f"{o.name}: setting midx=0")
+
+    else:
+        components=make_list_copy(_components)
+        for o in kat.components.values():
+            if o in components:
+                if isinstance(o, pykat.components.modulator): 
+                    o.midx = 0
+                    if verbose:
+                        print(f"{o.name}: setting midx=0")
+                    components = [c for c in components if c != o]
+                else:
+                    raise pkex.BasePyKatException("{} is not a modulator".format(o.name))
+                    
+        if len(components) != 0:
+            raise pkex.BasePyKatException("Cannot find component {}".format(components))
+        
+    return kat
+
 def round_to_n(x, n):
     if not x: return 0
     power = -int(math.floor(math.log10(abs(x)))) + (n - 1)
@@ -159,7 +192,7 @@ def make_list_copy(_l):
         
     return _l[:] # copy the list, just to be save
 
-def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90.0, debug=None, extra_cmds=None):
+def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90.0, relative=False, debug=None, extra_cmds=None):
     """
     Scans a DOF for a kat object to maximise or minimise the DOF's signal. 
     
@@ -174,8 +207,7 @@ def scan_to_precision(DOF, target_precision, minmax="max", phi=0.0, precision=90
     Returns phi of min/max and precision reached
     """
     while precision > target_precision * DOF.scale:
-        out = scan_DOF(DOF.kat, DOF, xlimits = [phi-1.5*precision, phi+1.5*precision], extra_cmds=extra_cmds)
-        
+        out = scan_DOF(DOF.kat, DOF, xlimits = [phi-1.5*precision, phi+1.5*precision], relative=relative, extra_cmds=extra_cmds)
         phi, precision = find_peak(out, DOF.port.name, minmax=minmax, debug=debug)
          
     return phi, precision
@@ -245,7 +277,7 @@ def find_peak(out, detector, minmax='max', debug=False):
 def scan_optics_string(_optics, _factors, _varName='scan', target="phi", linlog="lin", xlimits=[-100, 100], steps=200, axis=1,relative=False):
     optics=make_list_copy(_optics)
     factors=make_list_copy(_factors)
-    
+
     if len(optics) != len(factors):
         raise pkex.BasePyKatException("you must provide a factor for each optics")
 
@@ -331,7 +363,7 @@ def scan_DOF(kat, DOF, xlimits=[-100, 100], steps=200, relative=False, extra_cmd
     
     if extra_cmds:
         kat.parse(extra_cmds)
-        
+    
     return kat.run(cmd_args=["-cr=on"])
 
 def scan_optics(kat, _optics, _factors, target="phi", xlimits=[-100, 100], steps=200,relative=False, extra_cmds=None): 
@@ -349,9 +381,6 @@ def scan_optics(kat, _optics, _factors, target="phi", xlimits=[-100, 100], steps
         scan_optics(kat, ["ETMX", "ETMY", [1, -1])
     """
     kat = kat.deepcopy()
-
-    optics=make_list_copy(_optics)
-    factors=make_list_copy(_factors)
 
     kat.parse(scan_optic_cmds(_optics, _factors, target=target, xlimits=xlimits, steps=steps, relative=relative))
     
@@ -1133,14 +1162,6 @@ def find_max_power(kat, scanstring, detector, P_tol=1e-4, isplot=False, isMax = 
 
     return [Pmax, xmax], Prange, f2
 
-
-
-
-
-
-
-
-
 class IFO(object):
     """
     A generic object that contains various interferometer properties.
@@ -1191,11 +1212,12 @@ class IFO(object):
         """
         Zeroes the error signals by running the currently setup locks in this kat object.
         The corrected tunings are then applied to this object.  
+
+        returns output
         """
         
         if verbose:
-            print("Old tunings")
-            print(self.get_tunings())
+            old = self.get_tunings()
         
         base = self.kat.deepcopy()
         base.noxaxis = True
@@ -1204,8 +1226,16 @@ class IFO(object):
         self.apply_lock_feedback(out)
         
         if verbose:
-            print("New tunings")
-            print(self.get_tunings())
+            new = self.get_tunings()
+            print(" .--------------------------------------------.")
+            print(" | mirror  old tuning   new tuning   delta    |")
+            print(" +--------------------------------------------+")
+            for key in old.keys():
+                if key is not "keys":
+                    print(f" | {key}: {old[key]:12.6f} {new[key]:12.6f} {new[key]-old[key]:12.6f} |")
+            print(" `--------------------------------------------'")
+
+        return out
             
     def lock_drag(self, N, *args, update_state=True, **kwargs):
         """
@@ -1463,7 +1493,7 @@ class DOF(object):
         self.sigtype = sigtype
         self.optics=make_list_copy(_optics)
         self.factors=make_list_copy(_factors)
-        
+
         # scaling factor, to compensate for lower sensitivity compared
         # to DARM (in tuning plots for example)
         # Thus DARM has a scale of 1, all other DOFs a scale >1
@@ -1609,7 +1639,7 @@ class Output(object):
             Name of the frequency attribute in IFO. This should be a name of a frequency
             attribute in the IFO class, this is used when computing what frequency to
             demodulate at. None means a DC output
-        phase : foat
+        phase : float
             Demodulation phase
         block : str
             Which block in the kat object to add the commands to
@@ -1837,9 +1867,11 @@ class Output(object):
         return phase
     
     
-    def add_transfer(self, quad=None, sigtype="z"):
+    def add_transfer(self, quad=None, sigtype="z", addToBlock=None):
+        if addToBlock is None:
+            addToBlock = self._block
         cmds = self.get_transfer_cmds(quad=quad, sigtype=sigtype)
-        self.__IFO.kat.parse(cmds, addToBlock=self._block)
+        self.__IFO.kat.parse(cmds, addToBlock=addToBlock)
         return self.get_transfer_name(quad, sigtype)
         
         

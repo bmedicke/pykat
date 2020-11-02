@@ -752,12 +752,12 @@ class KatRun2D(object):
         self._freeze()
 
     def saveKatRun(self, filename):
-        with open(filename,'w') as outfile:
+        with open(filename,'wb') as outfile:
             pickle.dump(self, outfile)
 
     @staticmethod
     def loadKatRun(filename):
-        with open(filename,'r') as infile:
+        with open(filename,'rb') as infile:
             return pickle.load(infile)
 
     # def get(self, value): return self[value].squeeze()
@@ -2068,14 +2068,14 @@ class kat(object):
 
         kat_binary - Name of binary file to run
         """
-        p = Popen([self._finesse_exec(kat_binary), '-v'], stdout=PIPE)
+        p = Popen([self._finesse_exec(kat_binary), '-v'], stdout=PIPE, stderr=PIPE)
 
         out, err = p.communicate()
+        
+        if err:
+            raise pkex.BasePyKatException("Error getting version: " + str(err.decode("utf-8")))
 
-        if err is not None:
-            raise pkex.BasePyKatException("Error getting version: " + str(err))
-
-        vals = str(out).split()
+        vals = str(out.decode("utf-8")).split()
 
         return vals[2][1:-2] #Format: Finesse 2.2 (2.2-0-g994eac8), 03.07.2017
 
@@ -2095,12 +2095,12 @@ class kat(object):
             else:
                 raise pkex.BasePyKatException("page must be 1 or 2")
 
-        p = Popen([self._finesse_exec(kat_binary), command_str], stdout=PIPE)
+        p = Popen([self._finesse_exec(kat_binary), command_str], stdout=PIPE, stderr=PIPE)
 
         out, err = p.communicate()
 
-        if err is not None:
-            raise pkex.BasePyKatException("Error getting version: " + str(err))
+        if err:
+            raise pkex.BasePyKatException("Error getting syntax: " + str(err.decode("utf-8")))
 
         print(out.decode("utf-8"))
         return out.decode("utf-8")
@@ -2411,6 +2411,7 @@ class kat(object):
                     os.rename(outfile, newoutfile)
 
                     r.outfile = newoutfile
+                    outfile = newoutfile
 
                     if self.verbose: print("Output data saved to '{0}'".format(newoutfile))
                     
