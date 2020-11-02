@@ -13,24 +13,21 @@ build:
 requirements:
   run:
     - python
-    - numpy
+    - numpy >= 1.12
     - six
-    - scipy
+    - scipy >= 0.14.0
     - matplotlib
-    - flask >=0.10.1
     - finesse >=2.3
     - h5py
-    - graphviz
-    - python-graphviz   
+    - tabulate
     - click
   build:
     - python
     - setuptools
-    - numpy
+    - numpy >= 1.12
     - six
-    - scipy
+    - scipy >= 0.14.0
     - matplotlib
-    - flask >=0.10.1
     - finesse >=2.3
     
 test:
