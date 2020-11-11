@@ -3693,7 +3693,8 @@ class kat(object):
 
         def _do(params, comp, from_node, to_node):
 
-            qin = pykat.BeamParam(q=params["qxs"][-1], nr=float(from_node.n))
+            qin = pykat.BeamParam(q=params["qxs"][-1], nr=float(from_node.n),
+                                 wavelength=params["qxs"][-1].wavelength)
             Mabcd = comp.ABCD(from_node, to_node, direction=direction)
             if back_propagating:
                 Mabcd = np.linalg.inv(Mabcd)
