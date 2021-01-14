@@ -3603,6 +3603,9 @@ class kat(object):
         This function is separate from the Finesse tracing algorithm. It is purely
         python based. From a given node to another this function will find the
         components between each node and trace a beam along it.
+        
+        See pykat.plotting.beamtrace.plot_beam_trace for a version
+        which plots the Finesse eigenmodes.
 
         You can trace through multiple bounces off of optics, e.g.
 

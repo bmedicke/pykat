@@ -407,9 +407,12 @@ class AbstractMirrorComponent(Component):
         By setting one of the properties to None will set whether an m/m1/m2 (bs/bs1/bs2)
         command is used with Finesse.
         """
-        if R is not None: self.R = R
-        if T is not None: self.T = T
-        if L is not None: self.L = L
+        #if R is not None: 
+        self.R = R
+        #if T is not None: 
+        self.T = T
+        #if L is not None: 
+        self.L = L
 
     def completeRTL(self, R=None, T=None, L=None):
 
