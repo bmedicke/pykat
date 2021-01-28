@@ -135,7 +135,7 @@ def null_modulation_index(kat, _components=None, verbose=False):
             if isinstance(o, pykat.components.modulator): 
                 o.midx = 0
                 if verbose:
-                    print(f"{o.name}: setting midx=0")
+                    print("{name}: setting midx=0".format(name=o.name))
 
     else:
         components=make_list_copy(_components)
@@ -144,7 +144,7 @@ def null_modulation_index(kat, _components=None, verbose=False):
                 if isinstance(o, pykat.components.modulator): 
                     o.midx = 0
                     if verbose:
-                        print(f"{o.name}: setting midx=0")
+                        print("{name}: setting midx=0".format(name=o.name))
                     components = [c for c in components if c != o]
                 else:
                     raise pkex.BasePyKatException("{} is not a modulator".format(o.name))
@@ -1232,7 +1232,7 @@ class IFO(object):
             print(" +--------------------------------------------+")
             for key in old.keys():
                 if key is not "keys":
-                    print(f" | {key}: {old[key]:12.6f} {new[key]:12.6f} {new[key]-old[key]:12.6f} |")
+                    print(" | {key}: {old:12.6f} {new:12.6f} {new[key]-old[key]:12.6f} |".format(key=key, old=old[key], new=new[key]))
             print(" `--------------------------------------------'")
 
         return out
@@ -1286,16 +1286,16 @@ class IFO(object):
         if hasattr(self, 'x2axis'): self.x2axis.remove()
         
         kat = self.kat.deepcopy()
-        kat.parse(f"""
+        kat.parse("""
         var dummy 0
         xaxis dummy re lin 0 1 {N}
-        """)
+        """.format(N=N))
     
         for i, (target, attr, final) in enumerate(args):
-            kat.parse(f"""
+            kat.parse("""
             func LD{i} = ({final:.15G}) * $x1
             put* {target} {attr} $LD{i}
-            """)
+            """.format(i=i, final=final, target=target, attr=attr))
 
         drag = kat.run(**kwargs)
     
@@ -1309,7 +1309,7 @@ class IFO(object):
         for i, (target, attr, final) in enumerate(args):
             p = [_ for _ in self.kat.components[target]._params if _.name == attr]
             if len(p) != 1:
-                raise Exception(f"Could not find parameter {attr} for component {target}")
+                raise Exception("Could not find parameter {attr} for component {target}".format(attr=attr, target=target))
             else:
                 p[0].value += final * out.x[idx]
             
