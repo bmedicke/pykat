@@ -36,7 +36,7 @@ def load(filename):
     if verbose:
         print('x data:')
         print(out.x)
-        print('x data type: \n\t',end='')
+        print('x data type: \n\t')
         print(type(out.x))
     
     if plot:
