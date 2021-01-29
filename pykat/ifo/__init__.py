@@ -1237,7 +1237,7 @@ class IFO(object):
 
         return out
             
-    def lock_drag(self, N, *args, update_state=True, **kwargs):
+    def lock_drag(self, N, *args, **kwargs):
         """
         Performs a "lock drag" to gradually change the state of the interferometer model
         from one state to another. This is used when wanting to keep a model at a chosen
@@ -1282,6 +1282,11 @@ class IFO(object):
             Keyword arguments are passed to the `kat.run(**kwargs)` call.
             
         """
+        if "update_state" not in kwargs:
+            update_state=True
+        else:
+            update_state=kwargs['update_state']
+            
         if hasattr(self, 'xaxis'): self.xaxis.remove()
         if hasattr(self, 'x2axis'): self.x2axis.remove()
         
