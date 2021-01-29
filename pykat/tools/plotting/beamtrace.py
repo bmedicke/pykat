@@ -7,6 +7,12 @@ from warnings import warn
 def plot_beam_trace(_kat, from_node, to_node,
                     fig=None,size_axes=True,gouy_axes=True,return_data=False):
     """Plots the beam radius between two nodes.
+    
+    This method relies on the Finesse trace data and so
+    plots the beam parameters as used in the simulation.
+    See also finesse.kat().beamTrace for a pure python
+    implementation which traces a beam parameter 
+    using ABCD matrices.  
 
     Args:
         _kat (pykat.finesse.kat): The kat object containing the parsed katcode
