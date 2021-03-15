@@ -473,7 +473,7 @@ class surfacemap(object):
         plt.title('Surface map {0}, type {1}'.format(self.name, self.type))
         
         cbar = plt.colorbar()
-        cbar.set_clim(zmin, zmax)
+        cbar.mappable.set_clim(zmin, zmax)
         # cbar.set_clim(-1.86, 1.04)
         
         if clabel is not None:
@@ -1143,7 +1143,7 @@ class surfacemap(object):
             fig = pylab.figure()
             axes = pylab.pcolormesh(X, Y, Z) #, vmin=zmin, vmax=zmax)
             cbar = fig.colorbar(axes)
-            cbar.set_clim(Z.min(), Z.max())
+            cbar.mappable.set_clim(Z.min(), Z.max())
             pylab.title('Z_min = ' + str(Z.min()) + '   Z_max = ' + str(Z.max()))
             pylab.show()
         return Z
@@ -1657,7 +1657,7 @@ class mergedmap:
         plt.title('Merged map {0}, mode {1}'.format(self.name, mode))
 
         cbar = fig.colorbar(axes)
-        cbar.set_clim(zmin, zmax)
+        cbar.mappable.set_clim(zmin, zmax)
         
         if clabel is not None:
             cbar.set_label(clabel)
