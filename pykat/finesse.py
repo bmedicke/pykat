@@ -3522,7 +3522,7 @@ class kat(object):
             return np.piecewise(z, cond, funcs)
 
 
-        def plot(self, filename=None, show=False, w_scale="milli", markers=[], c='r', fig=None, label=None):
+        def plot(self, filename=None, show=False, w_scale="milli", markers=[], c='r', fig=None, axs=None, label=None):
             import matplotlib.pyplot as plt
 
             data = self.data
@@ -3530,8 +3530,11 @@ class kat(object):
             if fig is None:
                 fig = plt.figure()
 
-            ax1 = plt.subplot(211)
-            ax2 = plt.subplot(212)
+            if axs is None:
+                ax1 = plt.subplot(211)
+                ax2 = plt.subplot(212)
+            else:
+                ax1, ax2 = axs
 
             w_max = 0
             g_max = 0
@@ -3555,7 +3558,7 @@ class kat(object):
                     w_max = max(w_max, w.max())
                     g_max = max(g_max, _g.max())
 
-                    ax1.plot(z+_z, w, c=c)
+                    l, = ax1.plot(z+_z, w, c=c)
                     ax2.plot(z+_z, _g, c=c)
                 else:
                     z = data[comp]['z']
@@ -3581,21 +3584,20 @@ class kat(object):
                 ax1.set_ylabel("Beam size [%sm]"%pykat.SIlabel[w_scale])
 
             ax1.set_xlabel("Distance [m]")
-            ax1.set_ylim(0, w_max)
 
             ax2.set_xlim(0, None)
             ax2.grid(True, zorder=-10)
             ax2.set_ylabel("Gouy phase [deg]")
             ax2.set_xlabel("Distance [m]")
-            ax2.set_ylim(0, g_max)
 
-            plt.tight_layout()
+            ax1.figure.tight_layout()
 
             if filename is not None:
                 plt.savefig(filename)
 
             if show: plt.show()
-
+            if label:
+                plt.legend((l, label))
             return z + _z, w, _g
 
     def beamTrace(self, q_in, from_node, to_node, *args, **kwargs):
@@ -3603,6 +3605,9 @@ class kat(object):
         This function is separate from the Finesse tracing algorithm. It is purely
         python based. From a given node to another this function will find the
         components between each node and trace a beam along it.
+        
+        See pykat.plotting.beamtrace.plot_beam_trace for a version
+        which plots the Finesse eigenmodes.
 
         You can trace through multiple bounces off of optics, e.g.
 
