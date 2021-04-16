@@ -2793,7 +2793,7 @@ class kat(object):
                         found = True
 
         if not found:
-            pkex.BasePyKatException("The command fragment '%s' is not an extra line added to this kat object. Please check that the item you are trying to remove has not been parsed as a pykat object." % fragment)
+            raise pkex.BasePyKatException("The command fragment '%s' is not an extra line added to this kat object. Please check that the item you are trying to remove has not been parsed as a pykat object." % fragment)
 
 
     def addLine(self, line, block=NO_BLOCK) :
