@@ -1285,7 +1285,7 @@ class IFO(object):
         if "update_state" not in kwargs:
             update_state=True
         else:
-            update_state=kwargs['update_state']
+            update_state=kwargs.pop('update_state')
             
         if hasattr(self, 'xaxis'): self.xaxis.remove()
         if hasattr(self, 'x2axis'): self.x2axis.remove()
