@@ -1232,7 +1232,7 @@ class IFO(object):
             print(" +--------------------------------------------+")
             for key in old.keys():
                 if key is not "keys":
-                    print(" | {key}: {old:12.6f} {new:12.6f} {new-old:12.6f} |".format(key=key, old=old[key], new=new[key]))
+                    print(" | {key}: {old:12.6f} {new:12.6f} {delta:12.6f} |".format(key=key, old=old[key], new=new[key], delta=old[key]-new[key]))
             print(" `--------------------------------------------'")
 
         return out
@@ -1285,7 +1285,7 @@ class IFO(object):
         if "update_state" not in kwargs:
             update_state=True
         else:
-            update_state=kwargs['update_state']
+            update_state=kwargs.pop('update_state')
             
         if hasattr(self, 'xaxis'): self.xaxis.remove()
         if hasattr(self, 'x2axis'): self.x2axis.remove()
