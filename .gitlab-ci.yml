@@ -4,10 +4,6 @@ before_script:
   - wget --no-check-certificate https://agentx20.sr.bham.ac.uk:8080/static/scripts/brumsofttes_unsafe_certcheck.sh
   - chmod +x brumsofttes_unsafe_certcheck.sh
 
-python_2.7:
-  script:
-    - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 18 -g $CI_COMMIT_SHA
-
 python_3.5:
   script:
     - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 20 -g $CI_COMMIT_SHA
@@ -15,3 +11,15 @@ python_3.5:
 python_3.6:
   script:
     - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 19 -g $CI_COMMIT_SHA
+    
+python_3.7:
+  script:
+    - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 53 -g $CI_COMMIT_SHA
+    
+python_3.8:
+  script:
+    - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 54 -g $CI_COMMIT_SHA
+    
+python_3.9:
+  script:
+    - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 55 -g $CI_COMMIT_SHA
