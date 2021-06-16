@@ -16,9 +16,9 @@ python_3.7:
   script:
     - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 53 -g $CI_COMMIT_SHA
     
-python_3.8:
-  script:
-    - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 54 -g $CI_COMMIT_SHA
+# python_3.8:
+#   script:
+#     - ./brumsofttes_unsafe_certcheck.sh -s https://agentx20.sr.bham.ac.uk:8080 -u 1 -t 54 -g $CI_COMMIT_SHA
     
 python_3.9:
   script:
