@@ -1,9 +1,9 @@
-numpy >= 1.12
-scipy >= 0.14.0
+numpy
+scipy
 six
 h5py
 pandas
 matplotlib
 tabulate
-click >= 7.0
+click
     
