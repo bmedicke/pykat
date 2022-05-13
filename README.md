@@ -1,3 +1,10 @@
+# fork
+
+```sh
+pip install -e git+https://github.com/bmedicke/pykat.git#egg=pykat
+```
+
+
 PyKat
 ===========
 
