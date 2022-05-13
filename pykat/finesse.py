@@ -64,7 +64,8 @@ except ImportError:
 
 try:
     Container = collections.Container
-except ImportError:
+except (ImportError, AttributeError):
+    import collections.abc
     Container = collections.abc.Container
 
 try:
